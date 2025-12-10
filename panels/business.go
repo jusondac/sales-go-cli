@@ -70,11 +70,9 @@ func updateIngredientsView(state *models.AppState) {
 
 	for i, ing := range state.Ingredients {
 		if i == state.SelectedIngredient {
-			builder.WriteString(fmt.Sprintf("[yellow]▶ %-12s[white]\n", ing.Name))
-			builder.WriteString(fmt.Sprintf("  [yellow]Price: $%-4d Stock: %-4d[white]\n\n", ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("[yellow]▶ %s:$%d [%d][white]\n", ing.Name, ing.Price, ing.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("  %-12s\n", ing.Name))
-			builder.WriteString(fmt.Sprintf("  [gray]Price: $%-4d Stock: %-4d[white]\n\n", ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("  %s:$%d [%d]\n", ing.Name, ing.Price, ing.Stock))
 		}
 	}
 
@@ -89,16 +87,9 @@ func updatePreparationView(state *models.AppState) {
 
 	for i, prod := range state.Products {
 		if i == state.SelectedProduct {
-			builder.WriteString(fmt.Sprintf("[green]▶ %-15s[white]\n", prod.Name))
-			builder.WriteString(fmt.Sprintf("  [green]Price: $%-4d Stock: %-4d[white]\n", prod.Price, prod.Stock))
-			builder.WriteString("  Requires:\n")
-			for ingName, qty := range prod.Ingredients {
-				builder.WriteString(fmt.Sprintf("    [cyan]• %s x%d[white]\n", ingName, qty))
-			}
-			builder.WriteString("\n")
+			builder.WriteString(fmt.Sprintf("[green]▶ %s - $%d [%d][white]\n", prod.Name, prod.Price, prod.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("  %-15s\n", prod.Name))
-			builder.WriteString(fmt.Sprintf("  [gray]Price: $%-4d Stock: %-4d[white]\n\n", prod.Price, prod.Stock))
+			builder.WriteString(fmt.Sprintf("  %s - $%d [%d]\n", prod.Name, prod.Price, prod.Stock))
 		}
 	}
 
@@ -106,39 +97,28 @@ func updatePreparationView(state *models.AppState) {
 }
 
 func updateInfoView(state *models.AppState) {
-	data := map[string]string{
-		"💰 Money":        fmt.Sprintf("$%d", state.UserMoney),
-		"📦 Total Profit": fmt.Sprintf("$%d", state.TotalProfit),
-		"🏪 Products":     fmt.Sprintf("%d types", len(state.Products)),
-		"📊 Total Sales":  fmt.Sprintf("%d transactions", len(state.Transactions)),
-	}
-
 	var builder strings.Builder
-	builder.WriteString("[cyan]═══════════════════[white]\n")
-	builder.WriteString("[cyan]   USER STATUS[white]\n")
-	builder.WriteString("[cyan]═══════════════════[white]\n\n")
+	builder.WriteString("[cyan]USER STATUS[white]\n")
+	builder.WriteString(fmt.Sprintf("Money: [yellow]$%d[white]\n", state.UserMoney))
+	builder.WriteString(fmt.Sprintf("Profit: [green]$%d[white]\n", state.TotalProfit))
+	builder.WriteString(fmt.Sprintf("Products: [white]%d types[white]\n", len(state.Products)))
+	builder.WriteString(fmt.Sprintf("Sales: [white]%d transactions[white]\n", len(state.Transactions)))
 
-	keys := []string{"💰 Money", "📦 Total Profit", "🏪 Products", "📊 Total Sales"}
-	for _, key := range keys {
-		if val, ok := data[key]; ok {
-			builder.WriteString(fmt.Sprintf("[white]%-18s[white]\n", key))
-			builder.WriteString(fmt.Sprintf("[yellow]  %s[white]\n\n", val))
+	if state.SelectedProduct < len(state.Products) {
+		builder.WriteString("\n[cyan]PRODUCT INFO[white]\n")
+		prod := state.Products[state.SelectedProduct]
+		builder.WriteString(fmt.Sprintf("[yellow]%s[white]\n", prod.Name))
+		builder.WriteString(fmt.Sprintf("Price: [green]$%d[white]\n", prod.Price))
+		builder.WriteString(fmt.Sprintf("Stock: [cyan]%d[white]\n", prod.Stock))
+		if len(prod.Ingredients) > 0 {
+			builder.WriteString("Requires:\n")
+			for ingName, qty := range prod.Ingredients {
+				builder.WriteString(fmt.Sprintf("  %s x%d\n", ingName, qty))
+			}
 		}
 	}
 
-	if state.SelectedIngredient < len(state.Ingredients) {
-		builder.WriteString("\n[cyan]═══════════════════[white]\n")
-		builder.WriteString("[cyan] SELECTED ITEM[white]\n")
-		builder.WriteString("[cyan]═══════════════════[white]\n\n")
-
-		ing := state.Ingredients[state.SelectedIngredient]
-		builder.WriteString(fmt.Sprintf("[yellow]%s[white]\n\n", ing.Name))
-		builder.WriteString(fmt.Sprintf("[white]Price:[white] [green]$%d[white]\n", ing.Price))
-		builder.WriteString(fmt.Sprintf("[white]Stock:[white] [cyan]%d units[white]\n", ing.Stock))
-	}
-
-	builder.WriteString("\n\n[gray]═══════════════════[white]\n")
-	builder.WriteString("[gray]Navigation:[white]\n")
+	builder.WriteString("\n[gray]Navigation:[white]\n")
 	builder.WriteString("[yellow]←/→[white] Switch panels\n")
 	builder.WriteString("[red]q[white] Quit\n")
 

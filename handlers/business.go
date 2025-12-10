@@ -87,31 +87,28 @@ func DeleteProduct(state *models.AppState) {
 // ShowNewProductForm displays a form to create a new product
 func ShowNewProductForm(state *models.AppState) {
 	var productForm *tview.Form
+	var productName string
+	var productPrice int
 
+	// Step 1: Get product name and price
 	productForm = tview.NewForm().
 		AddInputField("Product Name", "", 20, nil, nil).
 		AddInputField("Price", "", 10, nil, nil).
-		AddButton("Create", func() {
+		AddButton("Next", func() {
 			nameField := productForm.GetFormItem(0).(*tview.InputField)
 			priceField := productForm.GetFormItem(1).(*tview.InputField)
 
-			name := nameField.GetText()
-			var price int
-			fmt.Sscanf(priceField.GetText(), "%d", &price)
+			productName = nameField.GetText()
+			fmt.Sscanf(priceField.GetText(), "%d", &productPrice)
 
-			if name != "" && price > 0 {
-				newProduct := models.Product{
-					Name:        name,
-					Ingredients: map[string]int{},
-					Price:       price,
-					Stock:       0,
-				}
-				state.Products = append(state.Products, newProduct)
+			if productName == "" || productPrice <= 0 {
+				return
 			}
 
+			// Step 2: Select ingredients
 			state.App.QueueUpdateDraw(func() {
 				state.Pages.RemovePage("form")
-				panels.UpdateBusinessViews(state)
+				showIngredientSelectionForm(state, productName, productPrice)
 			})
 		}).
 		AddButton("Cancel", func() {
@@ -121,9 +118,58 @@ func ShowNewProductForm(state *models.AppState) {
 		})
 
 	productForm.SetBorder(true).
-		SetTitle(" [yellow]New Product[white] ").
+		SetTitle(" [yellow]New Product - Step 1[white] ").
 		SetTitleAlign(tview.AlignCenter)
 
 	state.Pages.AddPage("form", utils.Modal(productForm, 50, 10), true, true)
 	state.App.SetFocus(productForm)
+}
+
+func showIngredientSelectionForm(state *models.AppState, productName string, productPrice int) {
+	var ingredientForm *tview.Form
+	selectedIngredients := make(map[string]int)
+
+	ingredientForm = tview.NewForm()
+
+	// Add input fields for each ingredient
+	for _, ing := range state.Ingredients {
+		ingredientForm.AddInputField(ing.Name, "0", 10, nil, nil)
+	}
+
+	ingredientForm.AddButton("Create", func() {
+		// Collect ingredient quantities
+		for i, ing := range state.Ingredients {
+			inputField := ingredientForm.GetFormItem(i).(*tview.InputField)
+			var qty int
+			fmt.Sscanf(inputField.GetText(), "%d", &qty)
+			if qty > 0 {
+				selectedIngredients[ing.Name] = qty
+			}
+		}
+
+		newProduct := models.Product{
+			Name:        productName,
+			Ingredients: selectedIngredients,
+			Price:       productPrice,
+			Stock:       0,
+		}
+		state.Products = append(state.Products, newProduct)
+
+		state.App.QueueUpdateDraw(func() {
+			state.Pages.RemovePage("form")
+			panels.UpdateBusinessViews(state)
+		})
+	}).
+		AddButton("Cancel", func() {
+			state.App.QueueUpdateDraw(func() {
+				state.Pages.RemovePage("form")
+			})
+		})
+
+	ingredientForm.SetBorder(true).
+		SetTitle(" [yellow]New Product - Step 2: Select Ingredients[white] ").
+		SetTitleAlign(tview.AlignCenter)
+
+	state.Pages.AddPage("form", utils.Modal(ingredientForm, 60, 15), true, true)
+	state.App.SetFocus(ingredientForm)
 }

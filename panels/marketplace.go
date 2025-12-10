@@ -60,10 +60,8 @@ func updateTransactionsView(state *models.AppState) {
 		}
 		for i := len(state.Transactions) - 1; i >= start; i-- {
 			t := state.Transactions[i]
-			builder.WriteString(fmt.Sprintf("[cyan]%s[white] bought [yellow]%s[white] - [green]%dx[white]\n",
-				t.BuyerName, t.Product, t.Amount))
-			builder.WriteString(fmt.Sprintf("  [green]+$%d[white] profit [gray]%s[white]\n\n",
-				t.Profit, t.Time.Format("15:04:05")))
+			builder.WriteString(fmt.Sprintf("[gray][%s][white][green]+$%d[white] [cyan]%s[white] bought [yellow]%s[white] - [green]%dx[white]\n",
+				t.Time.Format("15:04:05"), t.Profit, t.BuyerName, t.Product, t.Amount))
 		}
 	}
 
@@ -72,28 +70,23 @@ func updateTransactionsView(state *models.AppState) {
 
 func updateProfitView(state *models.AppState) {
 	var builder strings.Builder
-	builder.WriteString("[green]═══ STATISTICS ═══[white]\n\n")
+	builder.WriteString("[green]STATISTICS[white]\n\n")
 
-	builder.WriteString("[white]Total Profit:[white]\n")
-	builder.WriteString(fmt.Sprintf("[green]  $%d[white]\n\n", state.TotalProfit))
+	builder.WriteString("Total Profit: [green]$" + fmt.Sprintf("%d", state.TotalProfit) + "[white]\n")
+	builder.WriteString("Total Sales: [cyan]" + fmt.Sprintf("%d", len(state.Transactions)) + "[white] transactions\n")
 
-	builder.WriteString("[white]Total Sales:[white]\n")
-	builder.WriteString(fmt.Sprintf("[cyan]  %d transactions[white]\n\n", len(state.Transactions)))
-
-	builder.WriteString("[white]Average Sale:[white]\n")
 	if len(state.Transactions) > 0 {
 		avg := state.TotalProfit / len(state.Transactions)
-		builder.WriteString(fmt.Sprintf("[yellow]  $%d[white]\n\n", avg))
+		builder.WriteString("Average Sale: [yellow]$" + fmt.Sprintf("%d", avg) + "[white]\n")
 	} else {
-		builder.WriteString(fmt.Sprintf("[gray]  $0[white]\n\n"))
+		builder.WriteString("Average Sale: [gray]$0[white]\n")
 	}
 
 	// Product breakdown
-	builder.WriteString("\n[cyan]═══ INVENTORY ═══[white]\n\n")
+	builder.WriteString("\n[cyan]INVENTORY[white]\n\n")
 	for _, prod := range state.Products {
 		builder.WriteString(fmt.Sprintf("[yellow]%s[white]\n", prod.Name))
-		builder.WriteString(fmt.Sprintf("  [white]Stock: [cyan]%d[white]\n", prod.Stock))
-		builder.WriteString(fmt.Sprintf("  [white]Price: [green]$%d[white]\n\n", prod.Price))
+		builder.WriteString(fmt.Sprintf("  Stock: [cyan]%d[white] | Price: [green]$%d[white]\n\n", prod.Stock, prod.Price))
 	}
 
 	state.ProfitView.SetText(builder.String())
