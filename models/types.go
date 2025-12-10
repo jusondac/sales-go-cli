@@ -25,3 +25,11 @@ type Transaction struct {
 	Profit    int
 	Time      time.Time
 }
+
+// Tax represents a payment demand
+type Tax struct {
+	Name        string
+	Description string
+	Amount      int
+	Time        time.Time
+}

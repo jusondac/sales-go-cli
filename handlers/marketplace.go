@@ -12,11 +12,51 @@ import (
 // SimulateMarketplace runs a background goroutine that simulates customer purchases
 func SimulateMarketplace(state *models.AppState) {
 	names := []string{"Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry"}
+	taxNames := []string{
+		"Property Tax", "Business License", "Health Inspection", "Fire Safety Fee",
+		"City Tax", "State Tax", "Rent Payment", "Utilities Bill",
+		"Insurance Premium", "Waste Management", "Parking Permit", "Signage Fee",
+	}
+	taxDescriptions := map[string]string{
+		"Property Tax":      "Annual property tax assessment",
+		"Business License":  "Quarterly business operating license",
+		"Health Inspection": "Monthly health and safety inspection",
+		"Fire Safety Fee":   "Fire department safety compliance",
+		"City Tax":          "Municipal business tax",
+		"State Tax":         "State revenue tax",
+		"Rent Payment":      "Commercial property rent",
+		"Utilities Bill":    "Electricity, water, and gas",
+		"Insurance Premium": "Business liability insurance",
+		"Waste Management":  "Garbage and recycling service",
+		"Parking Permit":    "Employee parking permits",
+		"Signage Fee":       "Outdoor signage permit renewal",
+	}
 
 	ticker := time.NewTicker(3 * time.Second)
 	defer ticker.Stop()
 
+	lastTaxTime := time.Now()
+
 	for range ticker.C {
+		// Random tax generation (every 10-20 seconds)
+		if time.Since(lastTaxTime).Seconds() > float64(10+rand.Intn(10)) {
+			taxName := taxNames[rand.Intn(len(taxNames))]
+			taxAmount := (50 + rand.Intn(450)) * 10 // $500 - $5000
+
+			tax := models.Tax{
+				Name:        taxName,
+				Description: taxDescriptions[taxName],
+				Amount:      taxAmount,
+				Time:        time.Now(),
+			}
+			state.Taxes = append(state.Taxes, tax)
+			lastTaxTime = time.Now()
+
+			state.App.QueueUpdateDraw(func() {
+				panels.UpdateMarketplaceViews(state)
+			})
+		}
+
 		// Find products with stock
 		availableProducts := []int{}
 		for i, prod := range state.Products {
@@ -56,5 +96,38 @@ func SimulateMarketplace(state *models.AppState) {
 				}
 			})
 		}
+	}
+}
+
+// PayTax pays the selected tax bill
+func PayTax(state *models.AppState) {
+	if len(state.Taxes) == 0 {
+		return
+	}
+
+	// Ensure SelectedTax is within bounds
+	if state.SelectedTax >= len(state.Taxes) {
+		state.SelectedTax = len(state.Taxes) - 1
+	}
+	if state.SelectedTax < 0 {
+		state.SelectedTax = 0
+	}
+
+	tax := state.Taxes[state.SelectedTax]
+	if state.UserMoney >= tax.Amount {
+		state.UserMoney -= tax.Amount
+		state.Taxes = append(state.Taxes[:state.SelectedTax], state.Taxes[state.SelectedTax+1:]...)
+
+		// Adjust selection after deletion
+		if len(state.Taxes) == 0 {
+			state.SelectedTax = 0
+		} else if state.SelectedTax >= len(state.Taxes) {
+			state.SelectedTax = len(state.Taxes) - 1
+		}
+
+		state.App.QueueUpdateDraw(func() {
+			panels.UpdateMarketplaceViews(state)
+			panels.UpdateBusinessViews(state)
+		})
 	}
 }

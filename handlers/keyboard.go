@@ -118,6 +118,38 @@ func SetupGlobalKeyboard(pages *tview.Pages, state *models.AppState) {
 			}
 		}
 
+		// Marketplace panel controls (only when on marketplace page)
+		if state.CurrentPage == 1 {
+			switch event.Key() {
+			case tcell.KeyUp:
+				go func() {
+					if len(state.Taxes) > 0 {
+						state.SelectedTax = (state.SelectedTax - 1 + len(state.Taxes)) % len(state.Taxes)
+						state.App.QueueUpdateDraw(func() {
+							panels.UpdateMarketplaceViews(state)
+						})
+					}
+				}()
+				return nil
+			case tcell.KeyDown:
+				go func() {
+					if len(state.Taxes) > 0 {
+						state.SelectedTax = (state.SelectedTax + 1) % len(state.Taxes)
+						state.App.QueueUpdateDraw(func() {
+							panels.UpdateMarketplaceViews(state)
+						})
+					}
+				}()
+				return nil
+			}
+
+			switch event.Rune() {
+			case 'y':
+				go PayTax(state)
+				return nil
+			}
+		}
+
 		return event
 	})
 }

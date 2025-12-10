@@ -23,7 +23,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 		SetTitle(" [magenta]Marketplace Transactions[white] ").
 		SetBorderColor(tcell.ColorWhite)
 
-	// Right panel - Profit Stats
+	// Right top panel - Profit Stats
 	state.ProfitView = tview.NewTextView().
 		SetDynamicColors(true).
 		SetScrollable(true)
@@ -31,11 +31,23 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 		SetTitle(" [green]Profit Dashboard[white] ").
 		SetBorderColor(tcell.ColorWhite)
 
+	// Right bottom panel - Taxes
+	state.TaxesView = tview.NewTextView().
+		SetDynamicColors(true).
+		SetScrollable(true)
+	state.TaxesView.SetBorder(true).
+		SetTitle(" [red]Taxes & Bills[white] ").
+		SetBorderColor(tcell.ColorWhite)
+
 	UpdateMarketplaceViews(state)
+
+	rightPanel := tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(state.ProfitView, 0, 1, false).
+		AddItem(state.TaxesView, 0, 1, false)
 
 	mainLayout := tview.NewFlex().
 		AddItem(state.TransactionsView, 0, 2, false).
-		AddItem(state.ProfitView, 0, 1, false)
+		AddItem(rightPanel, 0, 1, false)
 
 	return mainLayout
 }
@@ -44,6 +56,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 func UpdateMarketplaceViews(state *models.AppState) {
 	updateTransactionsView(state)
 	updateProfitView(state)
+	updateTaxesView(state)
 }
 
 func updateTransactionsView(state *models.AppState) {
@@ -90,4 +103,26 @@ func updateProfitView(state *models.AppState) {
 	}
 
 	state.ProfitView.SetText(builder.String())
+}
+
+func updateTaxesView(state *models.AppState) {
+	var builder strings.Builder
+	builder.WriteString("[red]═══ PENDING BILLS ═══[white]\n\n")
+
+	if len(state.Taxes) == 0 {
+		builder.WriteString("[gray]No bills yet... Lucky you![white]\n")
+	} else {
+		builder.WriteString("[white]Keys: [yellow]↑/↓[white] navigate | [yellow](y)[white] pay\n\n")
+		for i, tax := range state.Taxes {
+			if i == state.SelectedTax {
+				builder.WriteString(fmt.Sprintf("[green]▶ [red]%s[white] - [red]$%d[white]\n", tax.Name, tax.Amount))
+				builder.WriteString(fmt.Sprintf("   [gray]%s[white]\n", tax.Description))
+			} else {
+				builder.WriteString(fmt.Sprintf("  [red]%s[white] - [red]$%d[white]\n", tax.Name, tax.Amount))
+				builder.WriteString(fmt.Sprintf("   [gray]%s[white]\n", tax.Description))
+			}
+		}
+	}
+
+	state.TaxesView.SetText(builder.String())
 }

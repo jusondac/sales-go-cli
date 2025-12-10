@@ -17,13 +17,16 @@ type AppState struct {
 	// Marketplace panel references
 	TransactionsView *tview.TextView
 	ProfitView       *tview.TextView
+	TaxesView        *tview.TextView
 
 	// Data
 	Ingredients        []Ingredient
 	Products           []Product
 	Transactions       []Transaction
+	Taxes              []Tax
 	SelectedIngredient int
 	SelectedProduct    int
+	SelectedTax        int
 	TotalProfit        int
 	UserMoney          int
 }
