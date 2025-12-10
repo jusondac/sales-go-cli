@@ -48,6 +48,12 @@ func SetupBusinessKeyboard(layout *tview.Flex, state *models.AppState) {
 // SetupGlobalKeyboard configures global keyboard handlers
 func SetupGlobalKeyboard(pages *tview.Pages, state *models.AppState) {
 	pages.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Check if a form is currently visible
+		frontPageName, _ := pages.GetFrontPage()
+		if frontPageName == "form" {
+			return event // Let the form handle the input
+		}
+
 		// Global navigation
 		if event.Key() == tcell.KeyLeft {
 			state.CurrentPage = 0

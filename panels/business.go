@@ -18,7 +18,7 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 		SetScrollable(true)
 	state.IngredientsListView.SetBorder(true).
 		SetTitle(" [yellow]Buy Ingredients[white] ").
-		SetBorderColor(tcell.ColorYellow)
+		SetBorderColor(tcell.ColorWhite)
 
 	// Center panel - Prepare Products
 	state.PreparationView = tview.NewTextView().
@@ -26,7 +26,7 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 		SetScrollable(true)
 	state.PreparationView.SetBorder(true).
 		SetTitle(" [green]Prepare Products[white] ").
-		SetBorderColor(tcell.ColorGreen)
+		SetBorderColor(tcell.ColorWhite)
 
 	// Product Info panel
 	state.ProductInfoView = tview.NewTextView().
@@ -34,7 +34,7 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 		SetScrollable(true)
 	state.ProductInfoView.SetBorder(true).
 		SetTitle(" [magenta]Product Info[white] ").
-		SetBorderColor(tcell.NewRGBColor(255, 0, 255))
+		SetBorderColor(tcell.ColorWhite)
 
 	// Right panel - Info
 	state.InfoView = tview.NewTextView().
@@ -42,7 +42,7 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 		SetScrollable(true)
 	state.InfoView.SetBorder(true).
 		SetTitle(" [cyan]Info Panel[white] ").
-		SetBorderColor(tcell.NewRGBColor(0, 255, 255))
+		SetBorderColor(tcell.ColorWhite)
 
 	UpdateBusinessViews(state)
 

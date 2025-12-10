@@ -21,7 +21,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 		})
 	state.TransactionsView.SetBorder(true).
 		SetTitle(" [magenta]Marketplace Transactions[white] ").
-		SetBorderColor(tcell.NewRGBColor(255, 0, 255))
+		SetBorderColor(tcell.ColorWhite)
 
 	// Right panel - Profit Stats
 	state.ProfitView = tview.NewTextView().
@@ -29,7 +29,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 		SetScrollable(true)
 	state.ProfitView.SetBorder(true).
 		SetTitle(" [green]Profit Dashboard[white] ").
-		SetBorderColor(tcell.ColorGreen)
+		SetBorderColor(tcell.ColorWhite)
 
 	UpdateMarketplaceViews(state)
 
