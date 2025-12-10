@@ -114,20 +114,20 @@ func PayTax(state *models.AppState) {
 	}
 
 	tax := state.Taxes[state.SelectedTax]
-	if state.UserMoney >= tax.Amount {
-		state.UserMoney -= tax.Amount
-		state.Taxes = append(state.Taxes[:state.SelectedTax], state.Taxes[state.SelectedTax+1:]...)
 
-		// Adjust selection after deletion
-		if len(state.Taxes) == 0 {
-			state.SelectedTax = 0
-		} else if state.SelectedTax >= len(state.Taxes) {
-			state.SelectedTax = len(state.Taxes) - 1
-		}
+	// Pay tax (can go into debt/negative)
+	state.UserMoney -= tax.Amount
+	state.Taxes = append(state.Taxes[:state.SelectedTax], state.Taxes[state.SelectedTax+1:]...)
 
-		state.App.QueueUpdateDraw(func() {
-			panels.UpdateMarketplaceViews(state)
-			panels.UpdateBusinessViews(state)
-		})
+	// Adjust selection after deletion
+	if len(state.Taxes) == 0 {
+		state.SelectedTax = 0
+	} else if state.SelectedTax >= len(state.Taxes) {
+		state.SelectedTax = len(state.Taxes) - 1
 	}
+
+	state.App.QueueUpdateDraw(func() {
+		panels.UpdateMarketplaceViews(state)
+		panels.UpdateBusinessViews(state)
+	})
 }
