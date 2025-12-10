@@ -109,13 +109,15 @@ func ShowNewProductForm(state *models.AppState) {
 				state.Products = append(state.Products, newProduct)
 			}
 
-			state.Pages.RemovePage("form")
 			state.App.QueueUpdateDraw(func() {
+				state.Pages.RemovePage("form")
 				panels.UpdateBusinessViews(state)
 			})
 		}).
 		AddButton("Cancel", func() {
-			state.Pages.RemovePage("form")
+			state.App.QueueUpdateDraw(func() {
+				state.Pages.RemovePage("form")
+			})
 		})
 
 	productForm.SetBorder(true).
