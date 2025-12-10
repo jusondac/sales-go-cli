@@ -70,11 +70,11 @@ func updateIngredientsView(state *models.AppState) {
 
 	for i, ing := range state.Ingredients {
 		if i == state.SelectedIngredient {
-			builder.WriteString(fmt.Sprintf("[black:yellow] ▶ %-12s [white]\n", ing.Name))
-			builder.WriteString(fmt.Sprintf("   [yellow]Price: $%-4d Stock: %-4d[white]\n\n", ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("[yellow]▶ %-12s[white]\n", ing.Name))
+			builder.WriteString(fmt.Sprintf("  [yellow]Price: $%-4d Stock: %-4d[white]\n\n", ing.Price, ing.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("   [white]%-12s[white]\n", ing.Name))
-			builder.WriteString(fmt.Sprintf("   [gray]Price: $%-4d Stock: %-4d[white]\n\n", ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("  %-12s\n", ing.Name))
+			builder.WriteString(fmt.Sprintf("  [gray]Price: $%-4d Stock: %-4d[white]\n\n", ing.Price, ing.Stock))
 		}
 	}
 
@@ -89,16 +89,16 @@ func updatePreparationView(state *models.AppState) {
 
 	for i, prod := range state.Products {
 		if i == state.SelectedProduct {
-			builder.WriteString(fmt.Sprintf("[black:green] ▶ %-15s [white]\n", prod.Name))
-			builder.WriteString(fmt.Sprintf("   [green]Price: $%-4d Stock: %-4d[white]\n", prod.Price, prod.Stock))
-			builder.WriteString("   [white]Requires:[white]\n")
+			builder.WriteString(fmt.Sprintf("[green]▶ %-15s[white]\n", prod.Name))
+			builder.WriteString(fmt.Sprintf("  [green]Price: $%-4d Stock: %-4d[white]\n", prod.Price, prod.Stock))
+			builder.WriteString("  Requires:\n")
 			for ingName, qty := range prod.Ingredients {
-				builder.WriteString(fmt.Sprintf("     [cyan]• %s x%d[white]\n", ingName, qty))
+				builder.WriteString(fmt.Sprintf("    [cyan]• %s x%d[white]\n", ingName, qty))
 			}
 			builder.WriteString("\n")
 		} else {
-			builder.WriteString(fmt.Sprintf("   [white]%-15s[white]\n", prod.Name))
-			builder.WriteString(fmt.Sprintf("   [gray]Price: $%-4d Stock: %-4d[white]\n\n", prod.Price, prod.Stock))
+			builder.WriteString(fmt.Sprintf("  %-15s\n", prod.Name))
+			builder.WriteString(fmt.Sprintf("  [gray]Price: $%-4d Stock: %-4d[white]\n\n", prod.Price, prod.Stock))
 		}
 	}
 

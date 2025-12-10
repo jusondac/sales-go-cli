@@ -20,8 +20,9 @@ func BuyIngredient(state *models.AppState) {
 	if state.UserMoney >= ing.Price {
 		state.UserMoney -= ing.Price
 		ing.Stock += 10
-		panels.UpdateBusinessViews(state)
-		state.App.Draw()
+		state.App.QueueUpdateDraw(func() {
+			panels.UpdateBusinessViews(state)
+		})
 	}
 }
 
@@ -62,8 +63,9 @@ func PrepareProduct(state *models.AppState) {
 			}
 		}
 		prod.Stock++
-		panels.UpdateBusinessViews(state)
-		state.App.Draw()
+		state.App.QueueUpdateDraw(func() {
+			panels.UpdateBusinessViews(state)
+		})
 	}
 }
 
@@ -77,8 +79,9 @@ func DeleteProduct(state *models.AppState) {
 	if state.SelectedProduct >= len(state.Products) {
 		state.SelectedProduct = len(state.Products) - 1
 	}
-	panels.UpdateBusinessViews(state)
-	state.App.Draw()
+	state.App.QueueUpdateDraw(func() {
+		panels.UpdateBusinessViews(state)
+	})
 }
 
 // ShowNewProductForm displays a form to create a new product
@@ -104,15 +107,15 @@ func ShowNewProductForm(state *models.AppState) {
 					Stock:       0,
 				}
 				state.Products = append(state.Products, newProduct)
-				panels.UpdateBusinessViews(state)
 			}
 
 			state.Pages.RemovePage("form")
-			state.App.Draw()
+			state.App.QueueUpdateDraw(func() {
+				panels.UpdateBusinessViews(state)
+			})
 		}).
 		AddButton("Cancel", func() {
 			state.Pages.RemovePage("form")
-			state.App.Draw()
 		})
 
 	productForm.SetBorder(true).
@@ -120,4 +123,5 @@ func ShowNewProductForm(state *models.AppState) {
 		SetTitleAlign(tview.AlignCenter)
 
 	state.Pages.AddPage("form", utils.Modal(productForm, 50, 10), true, true)
+	state.App.SetFocus(productForm)
 }

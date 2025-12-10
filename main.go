@@ -23,16 +23,11 @@ func main() {
 	businessPanel := panels.CreateBusinessPanel(state)
 	marketplacePanel := panels.CreateMarketplacePanel(state)
 
-	// Setup keyboard handlers for business panel
-	if flex, ok := businessPanel.(*tview.Flex); ok {
-		handlers.SetupBusinessKeyboard(flex, state)
-	}
-
 	// Add pages
 	state.Pages.AddPage("business", businessPanel, true, true)
 	state.Pages.AddPage("marketplace", marketplacePanel, true, false)
 
-	// Setup global keyboard handlers
+	// Setup global keyboard handlers (includes business panel controls)
 	handlers.SetupGlobalKeyboard(state.Pages, state)
 
 	// Start background goroutine for marketplace transactions
