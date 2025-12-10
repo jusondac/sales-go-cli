@@ -1,5 +1,4 @@
 package models
-package models
 
 import "time"
 
@@ -20,10 +19,9 @@ type Product struct {
 
 // Transaction represents a marketplace sale
 type Transaction struct {
-
-
-
-
-
-
-}	Time      time.Time	Profit    int	Amount    int	Product   string	BuyerName string
+	BuyerName string
+	Product   string
+	Amount    int
+	Profit    int
+	Time      time.Time
+}
