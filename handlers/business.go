@@ -95,26 +95,30 @@ func ShowNewProductForm(state *models.AppState) {
 		AddInputField("Product Name", "", 20, nil, nil).
 		AddInputField("Price", "", 10, nil, nil).
 		AddButton("Next", func() {
-			nameField := productForm.GetFormItem(0).(*tview.InputField)
-			priceField := productForm.GetFormItem(1).(*tview.InputField)
+			go func() {
+				nameField := productForm.GetFormItem(0).(*tview.InputField)
+				priceField := productForm.GetFormItem(1).(*tview.InputField)
 
-			productName = nameField.GetText()
-			fmt.Sscanf(priceField.GetText(), "%d", &productPrice)
+				productName = nameField.GetText()
+				fmt.Sscanf(priceField.GetText(), "%d", &productPrice)
 
-			if productName == "" || productPrice <= 0 {
-				return
-			}
+				if productName == "" || productPrice <= 0 {
+					return
+				}
 
-			// Step 2: Select ingredients
-			state.App.QueueUpdateDraw(func() {
-				state.Pages.RemovePage("form")
-				showIngredientSelectionForm(state, productName, productPrice)
-			})
+				// Step 2: Select ingredients
+				state.App.QueueUpdateDraw(func() {
+					state.Pages.RemovePage("form")
+					showIngredientSelectionForm(state, productName, productPrice)
+				})
+			}()
 		}).
 		AddButton("Cancel", func() {
-			state.App.QueueUpdateDraw(func() {
-				state.Pages.RemovePage("form")
-			})
+			go func() {
+				state.App.QueueUpdateDraw(func() {
+					state.Pages.RemovePage("form")
+				})
+			}()
 		})
 
 	productForm.SetBorder(true).
@@ -137,33 +141,37 @@ func showIngredientSelectionForm(state *models.AppState, productName string, pro
 	}
 
 	ingredientForm.AddButton("Create", func() {
-		// Collect ingredient quantities
-		for i, ing := range state.Ingredients {
-			inputField := ingredientForm.GetFormItem(i).(*tview.InputField)
-			var qty int
-			fmt.Sscanf(inputField.GetText(), "%d", &qty)
-			if qty > 0 {
-				selectedIngredients[ing.Name] = qty
+		go func() {
+			// Collect ingredient quantities
+			for i, ing := range state.Ingredients {
+				inputField := ingredientForm.GetFormItem(i).(*tview.InputField)
+				var qty int
+				fmt.Sscanf(inputField.GetText(), "%d", &qty)
+				if qty > 0 {
+					selectedIngredients[ing.Name] = qty
+				}
 			}
-		}
 
-		newProduct := models.Product{
-			Name:        productName,
-			Ingredients: selectedIngredients,
-			Price:       productPrice,
-			Stock:       0,
-		}
-		state.Products = append(state.Products, newProduct)
+			newProduct := models.Product{
+				Name:        productName,
+				Ingredients: selectedIngredients,
+				Price:       productPrice,
+				Stock:       0,
+			}
+			state.Products = append(state.Products, newProduct)
 
-		state.App.QueueUpdateDraw(func() {
-			state.Pages.RemovePage("form")
-			panels.UpdateBusinessViews(state)
-		})
-	}).
-		AddButton("Cancel", func() {
 			state.App.QueueUpdateDraw(func() {
 				state.Pages.RemovePage("form")
+				panels.UpdateBusinessViews(state)
 			})
+		}()
+	}).
+		AddButton("Cancel", func() {
+			go func() {
+				state.App.QueueUpdateDraw(func() {
+					state.Pages.RemovePage("form")
+				})
+			}()
 		})
 
 	ingredientForm.SetBorder(true).

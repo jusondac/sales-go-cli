@@ -11,6 +11,7 @@ type AppState struct {
 	// Business panel references
 	IngredientsListView *tview.TextView
 	PreparationView     *tview.TextView
+	ProductInfoView     *tview.TextView
 	InfoView            *tview.TextView
 
 	// Marketplace panel references

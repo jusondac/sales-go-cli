@@ -28,6 +28,14 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 		SetTitle(" [green]Prepare Products[white] ").
 		SetBorderColor(tcell.ColorGreen)
 
+	// Product Info panel
+	state.ProductInfoView = tview.NewTextView().
+		SetDynamicColors(true).
+		SetScrollable(true)
+	state.ProductInfoView.SetBorder(true).
+		SetTitle(" [magenta]Product Info[white] ").
+		SetBorderColor(tcell.NewRGBColor(255, 0, 255))
+
 	// Right panel - Info
 	state.InfoView = tview.NewTextView().
 		SetDynamicColors(true).
@@ -43,7 +51,8 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 		AddItem(state.IngredientsListView, 0, 1, false)
 
 	centerPanel := tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(state.PreparationView, 0, 1, false)
+		AddItem(state.PreparationView, 0, 1, false).
+		AddItem(state.ProductInfoView, 0, 1, false)
 
 	rightPanel := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(state.InfoView, 0, 1, false)
@@ -60,6 +69,7 @@ func CreateBusinessPanel(state *models.AppState) tview.Primitive {
 func UpdateBusinessViews(state *models.AppState) {
 	updateIngredientsView(state)
 	updatePreparationView(state)
+	updateProductInfoView(state)
 	updateInfoView(state)
 }
 
@@ -96,6 +106,27 @@ func updatePreparationView(state *models.AppState) {
 	state.PreparationView.SetText(builder.String())
 }
 
+func updateProductInfoView(state *models.AppState) {
+	var builder strings.Builder
+
+	if state.SelectedProduct < len(state.Products) {
+		prod := state.Products[state.SelectedProduct]
+		builder.WriteString(fmt.Sprintf("[yellow]%s[white]\n\n", prod.Name))
+		builder.WriteString(fmt.Sprintf("Price: [green]$%d[white]\n", prod.Price))
+		builder.WriteString(fmt.Sprintf("Stock: [cyan]%d[white]\n", prod.Stock))
+		if len(prod.Ingredients) > 0 {
+			builder.WriteString("\nRequires:\n")
+			for ingName, qty := range prod.Ingredients {
+				builder.WriteString(fmt.Sprintf("  %s x%d\n", ingName, qty))
+			}
+		}
+	} else {
+		builder.WriteString("[gray]No product selected[white]")
+	}
+
+	state.ProductInfoView.SetText(builder.String())
+}
+
 func updateInfoView(state *models.AppState) {
 	var builder strings.Builder
 	builder.WriteString("[cyan]USER STATUS[white]\n")
@@ -103,20 +134,6 @@ func updateInfoView(state *models.AppState) {
 	builder.WriteString(fmt.Sprintf("Profit: [green]$%d[white]\n", state.TotalProfit))
 	builder.WriteString(fmt.Sprintf("Products: [white]%d types[white]\n", len(state.Products)))
 	builder.WriteString(fmt.Sprintf("Sales: [white]%d transactions[white]\n", len(state.Transactions)))
-
-	if state.SelectedProduct < len(state.Products) {
-		builder.WriteString("\n[cyan]PRODUCT INFO[white]\n")
-		prod := state.Products[state.SelectedProduct]
-		builder.WriteString(fmt.Sprintf("[yellow]%s[white]\n", prod.Name))
-		builder.WriteString(fmt.Sprintf("Price: [green]$%d[white]\n", prod.Price))
-		builder.WriteString(fmt.Sprintf("Stock: [cyan]%d[white]\n", prod.Stock))
-		if len(prod.Ingredients) > 0 {
-			builder.WriteString("Requires:\n")
-			for ingName, qty := range prod.Ingredients {
-				builder.WriteString(fmt.Sprintf("  %s x%d\n", ingName, qty))
-			}
-		}
-	}
 
 	builder.WriteString("\n[gray]Navigation:[white]\n")
 	builder.WriteString("[yellow]←/→[white] Switch panels\n")
