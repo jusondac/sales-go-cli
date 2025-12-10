@@ -1,11 +1,11 @@
 package handlers
-package handlers
 
 import (
 	"dk/models"
 	"dk/panels"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
 )
 
 // SetupBusinessKeyboard configures keyboard handlers for the business panel
@@ -30,29 +30,28 @@ func SetupBusinessKeyboard(layout *tview.Flex, state *models.AppState) {
 			state.SelectedProduct = (state.SelectedProduct - 1 + len(state.Products)) % len(state.Products)
 			panels.UpdateBusinessViews(state)
 		case 'd':
+			state.SelectedProduct = (state.SelectedProduct + 1) % len(state.Products)
+			panels.UpdateBusinessViews(state)
+		}
+		return event
+	})
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}	})		return event		}			return nil			state.App.Stop()		} else if event.Rune() == 'q' {			return nil			pages.SwitchToPage("marketplace")			state.CurrentPage = 1		} else if event.Key() == tcell.KeyRight {			return nil			pages.SwitchToPage("business")			state.CurrentPage = 0		if event.Key() == tcell.KeyLeft {	pages.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {func SetupGlobalKeyboard(pages *tview.Pages, state *models.AppState) {// SetupGlobalKeyboard configures global keyboard handlers}	})		return event		}			panels.UpdateBusinessViews(state)			state.SelectedProduct = (state.SelectedProduct + 1) % len(state.Products)
+// SetupGlobalKeyboard configures global keyboard handlers
+func SetupGlobalKeyboard(pages *tview.Pages, state *models.AppState) {
+	pages.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyLeft {
+			state.CurrentPage = 0
+			pages.SwitchToPage("business")
+			return nil
+		} else if event.Key() == tcell.KeyRight {
+			state.CurrentPage = 1
+			pages.SwitchToPage("marketplace")
+			return nil
+		} else if event.Rune() == 'q' {
+			state.App.Stop()
+			return nil
+		}
+		return event
+	})
+}
