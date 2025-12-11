@@ -46,7 +46,7 @@ func CreateHelpPanel(state *models.AppState) *tview.TextView {
 	state.HelpPanelView.SetBorder(true).
 		SetBorderColor(tcell.ColorWhite)
 
-	text := "[white]Navigation: [yellow]←/→[white] Switch Panels  |  Business: [yellow](s/w)[white] Ingredients [yellow](e/d)[white] Products [yellow](b)[white] Buy [yellow](p)[white] Prepare [yellow](n)[white] New [red](x)[white] Delete  |  Marketplace: [yellow]↑/↓[white] Taxes [yellow](y)[white] Pay  |  [red](q)[white] Quit"
+	text := "[white]Navigation: [yellow]←/→[white] Switch Panels [gray](Business → Marketplace → Analytics)[white]  |  Business: [yellow](s/w)[white] Ingredients [yellow](e/d)[white] Products [yellow](b)[white] Buy [yellow](p)[white] Prepare [yellow](n)[white] New [red](x)[white] Delete  |  Marketplace: [yellow]↑/↓[white] Taxes [yellow](y)[white] Pay  |  [red](q)[white] Quit"
 
 	state.HelpPanelView.SetText(text)
 	return state.HelpPanelView
