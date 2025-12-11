@@ -20,6 +20,8 @@ func BuyIngredient(state *models.AppState) {
 	if state.UserMoney >= ing.Price {
 		state.UserMoney -= ing.Price
 		ing.Stock += 10
+		// Mark as initialized for volatility system
+		ing.IsInitialized = true
 		state.App.QueueUpdateDraw(func() {
 			panels.UpdateBusinessViews(state)
 		})
@@ -63,6 +65,8 @@ func PrepareProduct(state *models.AppState) {
 			}
 		}
 		prod.Stock++
+		// Mark as initialized for volatility system
+		prod.IsInitialized = true
 		state.App.QueueUpdateDraw(func() {
 			panels.UpdateBusinessViews(state)
 		})
@@ -153,10 +157,14 @@ func showIngredientSelectionForm(state *models.AppState, productName string, pro
 			}
 
 			newProduct := models.Product{
-				Name:        productName,
-				Ingredients: selectedIngredients,
-				Price:       productPrice,
-				Stock:       0,
+				Name:          productName,
+				Ingredients:   selectedIngredients,
+				Price:         productPrice,
+				Stock:         0,
+				Step:          10,
+				Floor:         productPrice * 7 / 10,
+				Ceil:          productPrice * 15 / 10,
+				IsInitialized: false,
 			}
 			state.Products = append(state.Products, newProduct)
 
