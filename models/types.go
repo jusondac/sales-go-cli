@@ -4,17 +4,25 @@ import "time"
 
 // Ingredient represents a raw material for products
 type Ingredient struct {
-	Name  string
-	Price int
-	Stock int
+	Name          string
+	Price         int
+	Stock         int
+	Step          int  // Max price change per tick
+	Floor         int  // Minimum price
+	Ceil          int  // Maximum price
+	IsInitialized bool // True after first purchase
 }
 
 // Product represents a sellable item made from ingredients
 type Product struct {
-	Name        string
-	Ingredients map[string]int // ingredient name -> quantity needed
-	Price       int
-	Stock       int
+	Name          string
+	Ingredients   map[string]int // ingredient name -> quantity needed
+	Price         int
+	Stock         int
+	Step          int  // Max price change per tick
+	Floor         int  // Minimum price
+	Ceil          int  // Maximum price
+	IsInitialized bool // True after first preparation
 }
 
 // Transaction represents a marketplace sale or payment
