@@ -23,13 +23,15 @@ func main() {
 	statusBar := panels.CreateStatusBar(state)
 	helpPanel := panels.CreateHelpPanel(state)
 
-	// Create both panels
+	// Create all panels
 	businessPanel := panels.CreateBusinessPanel(state)
 	marketplacePanel := panels.CreateMarketplacePanel(state)
+	analyticsPanel := panels.CreateAnalyticsPanel(state)
 
 	// Add pages
 	state.Pages.AddPage("business", businessPanel, true, true)
 	state.Pages.AddPage("marketplace", marketplacePanel, true, false)
+	state.Pages.AddPage("analytics", analyticsPanel, true, false)
 
 	// Main layout with status bar on top and help panel on bottom
 	mainLayout := tview.NewFlex().SetDirection(tview.FlexRow).
