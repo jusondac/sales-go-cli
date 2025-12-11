@@ -14,7 +14,7 @@ func CreateStatusBar(state *models.AppState) *tview.TextView {
 	state.StatusBarView = tview.NewTextView().
 		SetDynamicColors(true).
 		SetTextAlign(tview.AlignCenter)
-	
+
 	state.StatusBarView.SetBorder(true).
 		SetBorderColor(tcell.ColorWhite)
 
@@ -33,7 +33,6 @@ func UpdateStatusBar(state *models.AppState) {
 
 	text := fmt.Sprintf("[yellow]Money: $%d[white]  |  [green]Profit: $%d[white]  |  [cyan]Sales: %d[white]  |  [magenta]Products: %d[white]  |  [gray]Transactions: %d[white]",
 		state.UserMoney, state.TotalProfit, totalSales, len(state.Products), len(state.Transactions))
-	
+
 	state.StatusBarView.SetText(text)
 }
-

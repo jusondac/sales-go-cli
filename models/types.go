@@ -19,11 +19,11 @@ type Product struct {
 
 // Transaction represents a marketplace sale or payment
 type Transaction struct {
-	BuyerName string
-	Product   string
-	Amount    int
-	Profit    int
-	Time      time.Time
+	BuyerName    string
+	Product      string
+	Amount       int
+	Profit       int
+	Time         time.Time
 	IsTaxPayment bool
 }
 

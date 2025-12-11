@@ -117,7 +117,7 @@ func PayTax(state *models.AppState) {
 
 	// Pay tax (can go into debt/negative)
 	state.UserMoney -= tax.Amount
-	
+
 	// Add tax payment to transaction log
 	transaction := models.Transaction{
 		BuyerName:    "SYSTEM",
@@ -128,7 +128,7 @@ func PayTax(state *models.AppState) {
 		IsTaxPayment: true,
 	}
 	state.Transactions = append(state.Transactions, transaction)
-	
+
 	state.Taxes = append(state.Taxes[:state.SelectedTax], state.Taxes[state.SelectedTax+1:]...)
 
 	// Adjust selection after deletion
