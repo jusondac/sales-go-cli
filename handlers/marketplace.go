@@ -9,6 +9,55 @@ import (
 	"dk/utils"
 )
 
+// UpdatePrices applies volatility to all ingredient and product prices
+func UpdatePrices(state *models.AppState) {
+	// Update ingredient prices
+	for i := range state.Ingredients {
+		ing := &state.Ingredients[i]
+
+		// Skip volatility if not initialized or price is 0
+		if !ing.IsInitialized || ing.Price == 0 {
+			continue
+		}
+
+		change := rand.Intn(2*ing.Step+1) - ing.Step // Random value in range [-Step, +Step]
+		newPrice := ing.Price + change
+
+		// Clamp to floor and ceil
+		if newPrice < ing.Floor {
+			newPrice = ing.Floor
+		}
+		if newPrice > ing.Ceil {
+			newPrice = ing.Ceil
+		}
+
+		ing.Price = newPrice
+	}
+
+	// Update product prices
+	for i := range state.Products {
+		prod := &state.Products[i]
+
+		// Skip volatility if not initialized or price is 0
+		if !prod.IsInitialized || prod.Price == 0 {
+			continue
+		}
+
+		change := rand.Intn(2*prod.Step+1) - prod.Step // Random value in range [-Step, +Step]
+		newPrice := prod.Price + change
+
+		// Clamp to floor and ceil
+		if newPrice < prod.Floor {
+			newPrice = prod.Floor
+		}
+		if newPrice > prod.Ceil {
+			newPrice = prod.Ceil
+		}
+
+		prod.Price = newPrice
+	}
+}
+
 // SimulateMarketplace runs a background goroutine that simulates customer purchases
 func SimulateMarketplace(state *models.AppState) {
 	names := []string{"Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry"}
@@ -18,18 +67,18 @@ func SimulateMarketplace(state *models.AppState) {
 		"Insurance Premium", "Waste Management", "Parking Permit", "Signage Fee",
 	}
 	taxDescriptions := map[string]string{
-		"Property Tax":      "Annual property tax assessment",
-		"Business License":  "Quarterly business operating license",
-		"Health Inspection": "Monthly health and safety inspection",
-		"Fire Safety Fee":   "Fire department safety compliance",
+		"Property Tax":      "Annual property tax",
+		"Business License":  "Quarterly business license",
+		"Health Inspection": "Monthly health inspection",
+		"Fire Safety Fee":   "Fire department compliance",
 		"City Tax":          "Municipal business tax",
 		"State Tax":         "State revenue tax",
 		"Rent Payment":      "Commercial property rent",
-		"Utilities Bill":    "Electricity, water, and gas",
+		"Utilities Bill":    "Electricity, water, n gas",
 		"Insurance Premium": "Business liability insurance",
-		"Waste Management":  "Garbage and recycling service",
+		"Waste Management":  "Garbage n recycling service",
 		"Parking Permit":    "Employee parking permits",
-		"Signage Fee":       "Outdoor signage permit renewal",
+		"Signage Fee":       "Outdoor signage renewal",
 	}
 
 	ticker := time.NewTicker(3 * time.Second)
@@ -38,6 +87,18 @@ func SimulateMarketplace(state *models.AppState) {
 	lastTaxTime := time.Now()
 
 	for range ticker.C {
+		// Update all prices with volatility
+		UpdatePrices(state)
+
+		// Update views after price changes
+		state.App.QueueUpdateDraw(func() {
+			if state.CurrentPage == 0 {
+				panels.UpdateBusinessViews(state)
+			} else if state.CurrentPage == 2 {
+				panels.UpdateAnalyticsViews(state)
+			}
+		})
+
 		// Random tax generation (every 10-20 seconds)
 		if time.Since(lastTaxTime).Seconds() > float64(10+rand.Intn(10)) {
 			taxName := taxNames[rand.Intn(len(taxNames))]
