@@ -20,7 +20,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 			state.App.Draw()
 		})
 	state.TransactionsView.SetBorder(true).
-		SetTitle(" [magenta]Marketplace Transactions[white] ").
+		SetTitle(" [magenta]Recent Logs[white] ").
 		SetBorderColor(tcell.ColorWhite)
 
 	// Right top panel - Profit Stats
@@ -57,24 +57,31 @@ func UpdateMarketplaceViews(state *models.AppState) {
 	updateTransactionsView(state)
 	updateProfitView(state)
 	updateTaxesView(state)
+	UpdateStatusBar(state)
 }
 
 func updateTransactionsView(state *models.AppState) {
 	var builder strings.Builder
-	builder.WriteString("[magenta]═══ RECENT SALES ═══[white]\n\n")
 
 	if len(state.Transactions) == 0 {
-		builder.WriteString("[gray]No transactions yet...[white]\n")
+		builder.WriteString("[gray]No logs yet...[white]\n")
 	} else {
-		// Show last 20 transactions
+		// Show last 30 transactions
 		start := 0
-		if len(state.Transactions) > 20 {
-			start = len(state.Transactions) - 20
+		if len(state.Transactions) > 30 {
+			start = len(state.Transactions) - 30
 		}
 		for i := len(state.Transactions) - 1; i >= start; i-- {
 			t := state.Transactions[i]
-			builder.WriteString(fmt.Sprintf("[gray][%s][white][green]+$%d[white] [cyan]%s[white] bought [yellow]%s[white] - [green]%dx[white]\n",
-				t.Time.Format("15:04:05"), t.Profit, t.BuyerName, t.Product, t.Amount))
+			if t.IsTaxPayment {
+				// Red for tax payments
+				builder.WriteString(fmt.Sprintf("[gray][%s][white][red]-$%d[white] [red]PAID: %s[white]\n",
+					t.Time.Format("15:04:05"), -t.Profit, t.Product))
+			} else {
+				// Green for sales
+				builder.WriteString(fmt.Sprintf("[gray][%s][white][green]+$%d[white] [cyan]%s[white] bought [yellow]%s[white] - [green]%dx[white]\n",
+					t.Time.Format("15:04:05"), t.Profit, t.BuyerName, t.Product, t.Amount))
+			}
 		}
 	}
 
@@ -107,7 +114,6 @@ func updateProfitView(state *models.AppState) {
 
 func updateTaxesView(state *models.AppState) {
 	var builder strings.Builder
-	builder.WriteString("[red]═══ PENDING BILLS ═══[white]\n\n")
 
 	if len(state.Taxes) == 0 {
 		builder.WriteString("[gray]No bills yet... Lucky you![white]\n")
@@ -115,11 +121,11 @@ func updateTaxesView(state *models.AppState) {
 		builder.WriteString("[white]Keys: [yellow]↑/↓[white] navigate | [yellow](y)[white] pay\n\n")
 		for i, tax := range state.Taxes {
 			if i == state.SelectedTax {
-				builder.WriteString(fmt.Sprintf("[green]▶ [red]%s[white] - [red]$%d[white]\n", tax.Name, tax.Amount))
-				builder.WriteString(fmt.Sprintf("   [gray]%s[white]\n", tax.Description))
+				// Red background for selected tax
+				builder.WriteString(fmt.Sprintf("[black:red][%s][%s][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
 			} else {
-				builder.WriteString(fmt.Sprintf("  [red]%s[white] - [red]$%d[white]\n", tax.Name, tax.Amount))
-				builder.WriteString(fmt.Sprintf("   [gray]%s[white]\n", tax.Description))
+				// Normal display
+				builder.WriteString(fmt.Sprintf("[red][%s][white][gray][%s][white][red][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
 			}
 		}
 	}

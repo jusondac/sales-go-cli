@@ -17,13 +17,14 @@ type Product struct {
 	Stock       int
 }
 
-// Transaction represents a marketplace sale
+// Transaction represents a marketplace sale or payment
 type Transaction struct {
 	BuyerName string
 	Product   string
 	Amount    int
 	Profit    int
 	Time      time.Time
+	IsTaxPayment bool
 }
 
 // Tax represents a payment demand

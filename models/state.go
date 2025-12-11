@@ -19,6 +19,9 @@ type AppState struct {
 	ProfitView       *tview.TextView
 	TaxesView        *tview.TextView
 
+	// Top status bar
+	StatusBarView *tview.TextView
+
 	// Data
 	Ingredients        []Ingredient
 	Products           []Product

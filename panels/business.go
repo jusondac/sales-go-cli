@@ -71,6 +71,7 @@ func UpdateBusinessViews(state *models.AppState) {
 	updatePreparationView(state)
 	updateProductInfoView(state)
 	updateInfoView(state)
+	UpdateStatusBar(state)
 }
 
 func updateIngredientsView(state *models.AppState) {
