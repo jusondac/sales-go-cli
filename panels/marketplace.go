@@ -121,10 +121,10 @@ func updateTaxesView(state *models.AppState) {
 		builder.WriteString("[white]Keys: [yellow]↑/↓[white] navigate | [yellow](y)[white] pay\n\n")
 		for i, tax := range state.Taxes {
 			if i == state.SelectedTax {
-				// Red background for selected tax
-				builder.WriteString(fmt.Sprintf("[black:red][%s][%s][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
+				// White text on red background for selected tax
+				builder.WriteString(fmt.Sprintf("[white:red][%s][%s][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
 			} else {
-				// Normal display
+				// Red text for name and amount, gray for description
 				builder.WriteString(fmt.Sprintf("[red][%s][white][gray][%s][white][red][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
 			}
 		}

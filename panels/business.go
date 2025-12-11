@@ -76,14 +76,13 @@ func UpdateBusinessViews(state *models.AppState) {
 
 func updateIngredientsView(state *models.AppState) {
 	var builder strings.Builder
-	builder.WriteString("[yellow]═══ INGREDIENTS ═══[white]\n\n")
 	builder.WriteString("[white]Keys: [yellow](s/w)[white] navigate | [yellow](b)[white] buy\n\n")
 
 	for i, ing := range state.Ingredients {
 		if i == state.SelectedIngredient {
-			builder.WriteString(fmt.Sprintf("[yellow]▶ %s:$%d [%d][white]\n", ing.Name, ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("[white:yellow]%s:$%d [%d][white]\n", ing.Name, ing.Price, ing.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("  %s:$%d [%d]\n", ing.Name, ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("%s:$%d [%d]\n", ing.Name, ing.Price, ing.Stock))
 		}
 	}
 
@@ -92,15 +91,14 @@ func updateIngredientsView(state *models.AppState) {
 
 func updatePreparationView(state *models.AppState) {
 	var builder strings.Builder
-	builder.WriteString("[green]═══ PRODUCTS ═══[white]\n\n")
 	builder.WriteString("[white]Keys: [green](e/d)[white] navigate | [green](p)[white] prepare\n")
 	builder.WriteString("[white]Keys: [green](n)[white] new product | [red](x)[white] delete\n\n")
 
 	for i, prod := range state.Products {
 		if i == state.SelectedProduct {
-			builder.WriteString(fmt.Sprintf("[green]▶ %s - $%d [%d][white]\n", prod.Name, prod.Price, prod.Stock))
+			builder.WriteString(fmt.Sprintf("[white:green]%s - $%d [%d][white]\n", prod.Name, prod.Price, prod.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("  %s - $%d [%d]\n", prod.Name, prod.Price, prod.Stock))
+			builder.WriteString(fmt.Sprintf("%s - $%d [%d]\n", prod.Name, prod.Price, prod.Stock))
 		}
 	}
 
