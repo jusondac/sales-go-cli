@@ -32,10 +32,10 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 		SetBorderColor(tcell.ColorWhite)
 
 	// Right bottom panel - Taxes
-	state.TaxesView = tview.NewTextView().
-		SetDynamicColors(true).
-		SetScrollable(true)
-	state.TaxesView.SetBorder(true).
+	state.TaxesList = tview.NewList().
+		ShowSecondaryText(true).
+		SetHighlightFullLine(true)
+	state.TaxesList.SetBorder(true).
 		SetTitle(" [red]Taxes & Bills[white] ").
 		SetBorderColor(tcell.ColorWhite)
 
@@ -43,7 +43,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 
 	rightPanel := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(state.ProfitView, 0, 1, false).
-		AddItem(state.TaxesView, 0, 1, false)
+		AddItem(state.TaxesList, 0, 1, false)
 
 	mainLayout := tview.NewFlex().
 		AddItem(state.TransactionsView, 0, 1, false).
@@ -113,22 +113,26 @@ func updateProfitView(state *models.AppState) {
 }
 
 func updateTaxesView(state *models.AppState) {
-	var builder strings.Builder
+	state.TaxesList.Clear()
 
 	if len(state.Taxes) == 0 {
-		builder.WriteString("[gray]No bills yet... Lucky you![white]\n")
+		state.TaxesList.AddItem("[gray]No bills yet... Lucky you!", "", 0, nil)
 	} else {
-		builder.WriteString("[white]Keys: [yellow]↑/↓[white] navigate | [yellow](y)[white] pay\n\n")
 		for i, tax := range state.Taxes {
-			if i == state.SelectedTax {
-				// White text on red background for selected tax
-				builder.WriteString(fmt.Sprintf("[white:red] [%s] [%s] [$%d] [-:-:-]\n", tax.Name, tax.Description, tax.Amount))
-			} else {
-				// Red text for name and amount, gray for description
-				builder.WriteString(fmt.Sprintf("[red:-:-] [%s] [white:-:-][gray:-:-][%s][white:-:-] [red:-:-][$%d][-:-:-]\n", tax.Name, tax.Description, tax.Amount))
-			}
+			mainText := fmt.Sprintf("[red]%s [-:-:-][white] - [red]$%d", tax.Name, tax.Amount)
+			secondaryText := fmt.Sprintf("[gray]%s", tax.Description)
+
+			// Capture index for closure
+			idx := i
+			state.TaxesList.AddItem(mainText, secondaryText, 0, func() {
+				// Update selected tax index when item changes
+				state.SelectedTax = idx
+			})
+		}
+
+		// Set the current selection
+		if state.SelectedTax >= 0 && state.SelectedTax < len(state.Taxes) {
+			state.TaxesList.SetCurrentItem(state.SelectedTax)
 		}
 	}
-
-	state.TaxesView.SetText(builder.String())
 }
