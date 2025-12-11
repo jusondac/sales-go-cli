@@ -80,9 +80,9 @@ func updateIngredientsView(state *models.AppState) {
 
 	for i, ing := range state.Ingredients {
 		if i == state.SelectedIngredient {
-			builder.WriteString(fmt.Sprintf("[white:yellow]%s:$%d [%d][white]\n", ing.Name, ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("[black:yellow]%s:$%d [%d][-:-:-]\n", ing.Name, ing.Price, ing.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("%s:$%d [%d]\n", ing.Name, ing.Price, ing.Stock))
+			builder.WriteString(fmt.Sprintf("[white:-:-]%s:$%d [%d]\n", ing.Name, ing.Price, ing.Stock))
 		}
 	}
 
@@ -96,9 +96,9 @@ func updatePreparationView(state *models.AppState) {
 
 	for i, prod := range state.Products {
 		if i == state.SelectedProduct {
-			builder.WriteString(fmt.Sprintf("[white:green]%s - $%d [%d][white]\n", prod.Name, prod.Price, prod.Stock))
+			builder.WriteString(fmt.Sprintf("[black:green]%s - $%d [%d][-:-:-]\n", prod.Name, prod.Price, prod.Stock))
 		} else {
-			builder.WriteString(fmt.Sprintf("%s - $%d [%d]\n", prod.Name, prod.Price, prod.Stock))
+			builder.WriteString(fmt.Sprintf("[white:-:-]%s - $%d [%d]\n", prod.Name, prod.Price, prod.Stock))
 		}
 	}
 

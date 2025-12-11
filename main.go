@@ -19,8 +19,9 @@ func main() {
 	state.App = tview.NewApplication()
 	state.Pages = tview.NewPages()
 
-	// Create status bar
+	// Create status bar and help panel
 	statusBar := panels.CreateStatusBar(state)
+	helpPanel := panels.CreateHelpPanel(state)
 
 	// Create both panels
 	businessPanel := panels.CreateBusinessPanel(state)
@@ -30,10 +31,11 @@ func main() {
 	state.Pages.AddPage("business", businessPanel, true, true)
 	state.Pages.AddPage("marketplace", marketplacePanel, true, false)
 
-	// Main layout with status bar on top
+	// Main layout with status bar on top and help panel on bottom
 	mainLayout := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(statusBar, 3, 0, false).
-		AddItem(state.Pages, 0, 1, true)
+		AddItem(state.Pages, 0, 1, true).
+		AddItem(helpPanel, 3, 0, false)
 
 	// Setup global keyboard handlers (includes business panel controls)
 	handlers.SetupGlobalKeyboard(state.Pages, state)

@@ -46,7 +46,7 @@ func CreateMarketplacePanel(state *models.AppState) tview.Primitive {
 		AddItem(state.TaxesView, 0, 1, false)
 
 	mainLayout := tview.NewFlex().
-		AddItem(state.TransactionsView, 0, 2, false).
+		AddItem(state.TransactionsView, 0, 1, false).
 		AddItem(rightPanel, 0, 1, false)
 
 	return mainLayout
@@ -122,10 +122,10 @@ func updateTaxesView(state *models.AppState) {
 		for i, tax := range state.Taxes {
 			if i == state.SelectedTax {
 				// White text on red background for selected tax
-				builder.WriteString(fmt.Sprintf("[white:red][%s][%s][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
+				builder.WriteString(fmt.Sprintf("[white:red][%s][%s][$%d][-:-:-]\n", tax.Name, tax.Description, tax.Amount))
 			} else {
 				// Red text for name and amount, gray for description
-				builder.WriteString(fmt.Sprintf("[red][%s][white][gray][%s][white][red][$%d][white]\n", tax.Name, tax.Description, tax.Amount))
+				builder.WriteString(fmt.Sprintf("[red:-:-][%s][white:-:-][gray:-:-][%s][white:-:-][red:-:-][$%d][-:-:-]\n", tax.Name, tax.Description, tax.Amount))
 			}
 		}
 	}

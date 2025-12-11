@@ -22,6 +22,9 @@ type AppState struct {
 	// Top status bar
 	StatusBarView *tview.TextView
 
+	// Bottom help panel
+	HelpPanelView *tview.TextView
+
 	// Data
 	Ingredients        []Ingredient
 	Products           []Product
