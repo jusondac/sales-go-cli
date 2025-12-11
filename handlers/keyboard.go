@@ -56,12 +56,24 @@ func SetupGlobalKeyboard(pages *tview.Pages, state *models.AppState) {
 
 		// Global navigation
 		if event.Key() == tcell.KeyLeft {
-			state.CurrentPage = 0
-			pages.SwitchToPage("business")
+			state.CurrentPage = (state.CurrentPage - 1 + 3) % 3
+			if state.CurrentPage == 0 {
+				pages.SwitchToPage("business")
+			} else if state.CurrentPage == 1 {
+				pages.SwitchToPage("marketplace")
+			} else {
+				pages.SwitchToPage("analytics")
+			}
 			return nil
 		} else if event.Key() == tcell.KeyRight {
-			state.CurrentPage = 1
-			pages.SwitchToPage("marketplace")
+			state.CurrentPage = (state.CurrentPage + 1) % 3
+			if state.CurrentPage == 0 {
+				pages.SwitchToPage("business")
+			} else if state.CurrentPage == 1 {
+				pages.SwitchToPage("marketplace")
+			} else {
+				pages.SwitchToPage("analytics")
+			}
 			return nil
 		} else if event.Rune() == 'q' {
 			state.App.Stop()
@@ -120,32 +132,17 @@ func SetupGlobalKeyboard(pages *tview.Pages, state *models.AppState) {
 
 		// Marketplace panel controls (only when on marketplace page)
 		if state.CurrentPage == 1 {
-			switch event.Key() {
-			case tcell.KeyUp:
-				go func() {
-					if len(state.Taxes) > 0 {
-						state.SelectedTax = (state.SelectedTax - 1 + len(state.Taxes)) % len(state.Taxes)
-						state.App.QueueUpdateDraw(func() {
-							panels.UpdateMarketplaceViews(state)
-						})
-					}
-				}()
-				return nil
-			case tcell.KeyDown:
-				go func() {
-					if len(state.Taxes) > 0 {
-						state.SelectedTax = (state.SelectedTax + 1) % len(state.Taxes)
-						state.App.QueueUpdateDraw(func() {
-							panels.UpdateMarketplaceViews(state)
-						})
-					}
-				}()
-				return nil
-			}
-
 			switch event.Rune() {
 			case 'y':
-				go PayTax(state)
+				go func() {
+					// Get current selection from list
+					if state.TaxesList != nil && len(state.Taxes) > 0 {
+						state.SelectedTax = state.TaxesList.GetCurrentItem()
+						if state.SelectedTax >= 0 && state.SelectedTax < len(state.Taxes) {
+							PayTax(state)
+						}
+					}
+				}()
 				return nil
 			}
 		}
