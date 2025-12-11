@@ -6,7 +6,7 @@ import "github.com/rivo/tview"
 type AppState struct {
 	App         *tview.Application
 	Pages       *tview.Pages
-	CurrentPage int // 0: Business, 1: Marketplace
+	CurrentPage int // 0: Business, 1: Marketplace, 2: Analytics
 
 	// Business panel references
 	IngredientsListView *tview.TextView
@@ -17,7 +17,12 @@ type AppState struct {
 	// Marketplace panel references
 	TransactionsView *tview.TextView
 	ProfitView       *tview.TextView
-	TaxesView        *tview.TextView
+	TaxesList        *tview.List
+
+	// Analytics panel references
+	IngredientPricesView *tview.TextView
+	ProductPricesView    *tview.TextView
+	PriceHistoryView     *tview.TextView
 
 	// Top status bar
 	StatusBarView *tview.TextView
@@ -50,12 +55,12 @@ func NewAppState() *AppState {
 // InitializeData sets up initial ingredients and products
 func (s *AppState) InitializeData() {
 	s.Ingredients = []Ingredient{
-		{Name: "Flour", Price: 10, Stock: 0},
-		{Name: "Sugar", Price: 15, Stock: 0},
-		{Name: "Eggs", Price: 20, Stock: 0},
-		{Name: "Butter", Price: 25, Stock: 0},
-		{Name: "Milk", Price: 12, Stock: 0},
-		{Name: "Chocolate", Price: 30, Stock: 0},
+		{Name: "Flour", Price: 10, Stock: 0, Step: 2, Floor: 5, Ceil: 20},
+		{Name: "Sugar", Price: 15, Stock: 0, Step: 3, Floor: 8, Ceil: 25},
+		{Name: "Eggs", Price: 20, Stock: 0, Step: 4, Floor: 10, Ceil: 35},
+		{Name: "Butter", Price: 25, Stock: 0, Step: 5, Floor: 15, Ceil: 40},
+		{Name: "Milk", Price: 12, Stock: 0, Step: 2, Floor: 6, Ceil: 22},
+		{Name: "Chocolate", Price: 30, Stock: 0, Step: 6, Floor: 20, Ceil: 50},
 	}
 
 	s.Products = []Product{
@@ -69,6 +74,9 @@ func (s *AppState) InitializeData() {
 			},
 			Price: 100,
 			Stock: 0,
+			Step:  10,
+			Floor: 70,
+			Ceil:  150,
 		},
 		{
 			Name: "Cookie",
@@ -79,6 +87,9 @@ func (s *AppState) InitializeData() {
 			},
 			Price: 50,
 			Stock: 0,
+			Step:  5,
+			Floor: 35,
+			Ceil:  80,
 		},
 	}
 
